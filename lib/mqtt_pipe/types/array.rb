@@ -10,11 +10,10 @@ module MQTTPipe
           type - packer_code
         end
         
-        begin
-          length.times.map{ Packer.unpack_single raw }
-        rescue EndOfPacket
-          raise FormatError, 'Badly formatted array'
-        end
+        array = Packer.unpack raw, limit: length
+        raise FormatError, 'Badly formatted array' unless array.length == length
+        
+        return array
       end
     end
 

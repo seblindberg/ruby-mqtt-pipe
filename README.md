@@ -20,7 +20,19 @@ Or install it yourself as:
 
 ## Usage
 
-This is coming.
+```ruby
+pipe = MQTTPipe.create do
+  on 'hello/world/#' do |message, id|
+    p message, id
+  end
+end
+
+pipe.open 'test.mosquitto.org', port: 1883 do
+  100.times do |i|
+    send "hello/world/#{i}", Time.now
+  end
+end
+```
 
 ## Contributing
 

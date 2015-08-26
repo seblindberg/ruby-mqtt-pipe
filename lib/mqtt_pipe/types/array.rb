@@ -11,7 +11,7 @@ module MQTTPipe
         end
         
         array = Packer.unpack raw, limit: length
-        raise FormatError, 'Badly formatted array' unless array.length == length
+        raise Packer::FormatError, 'Badly formatted array' unless array.length == length
         
         return array
       end

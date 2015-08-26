@@ -124,29 +124,29 @@ describe MQTTPipe::Packer do
     it 'raises an error on malformated packets' do
       # Make the list one item longer than what is written
       raw = [0x87, *(1..6).to_a].pack 'CC*'
-      expect{klass.unpack(raw)}.to raise_error MQTTPipe::FormatError
+      expect{klass.unpack(raw)}.to raise_error MQTTPipe::Packer::FormatError
       
       # Strings
       raw = [0xA7, 'string'].pack 'CA*'
-      expect{klass.unpack(raw)}.to raise_error MQTTPipe::FormatError
+      expect{klass.unpack(raw)}.to raise_error MQTTPipe::Packer::FormatError
       
       # Integers
       raw = [0xC4].pack 'C'
-      expect{klass.unpack(raw)}.to raise_error MQTTPipe::FormatError
+      expect{klass.unpack(raw)}.to raise_error MQTTPipe::Packer::FormatError
       
       raw = [0xC5, 1].pack 'C*'
-      expect{klass.unpack(raw)}.to raise_error MQTTPipe::FormatError
+      expect{klass.unpack(raw)}.to raise_error MQTTPipe::Packer::FormatError
       
       raw = [0xC6, 1,2,3].pack 'C*'
-      expect{klass.unpack(raw)}.to raise_error MQTTPipe::FormatError
+      expect{klass.unpack(raw)}.to raise_error MQTTPipe::Packer::FormatError
       
       # Float
       raw = [0xC7].pack 'C*'
-      expect{klass.unpack(raw)}.to raise_error MQTTPipe::FormatError
+      expect{klass.unpack(raw)}.to raise_error MQTTPipe::Packer::FormatError
       
       # Time
       raw = [0xC8, 1].pack 'C*'
-      expect{klass.unpack(raw)}.to raise_error MQTTPipe::FormatError
+      expect{klass.unpack(raw)}.to raise_error MQTTPipe::Packer::FormatError
     end
     
     describe 'Array' do

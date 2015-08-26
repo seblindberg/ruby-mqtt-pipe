@@ -51,28 +51,25 @@ describe MQTTPipe::Listener do
         expect(@listener.match matching_topic_2).to be_truthy
       end
       
-      it 'returns false for a non matching topic' do
-        expect(@listener.match non_matching_topic).to be_falsy
+      it 'returns nil for a non matching topic' do
+        expect(@listener.match non_matching_topic).to be false
       end
       
       it 'also responds to #===' do
-        expect(@listener === matching_topic_1).to be_truthy
-        expect(@listener === non_matching_topic).to be_falsy
+        expect(@listener === matching_topic_1).to be true
+        expect(@listener === non_matching_topic).to be false
       end
       
       it 'captures wildcard match groups' do
         m = @listener.match matching_topic_2
         
-        expect(m[1]).to eq 'some'
-        expect(m[2]).to eq 'with/more/5'
+        expect(m).not_to be false
+        expect(m[0]).to eq 'some'
+        expect(m[1]).to eq 'with/more/5'
       end
     end
     
-    describe '#call' do
-      # it 'requires one argument' do
-      #   expect{@listener.call}.to raise_error ArgumentError
-      # end
-      
+    describe '#call' do      
       it 'runs the given callback' do
         expect(@listener.call 42).to eq 84
       end

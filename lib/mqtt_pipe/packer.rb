@@ -1,6 +1,4 @@
 module MQTTPipe
-  class FormatError < StandardError; end
-  class EndOfPacket < StandardError; end
   
   ##
   # The packer module is used to pack/unpack classes that
@@ -8,6 +6,21 @@ module MQTTPipe
   
   module Packer
     extend self
+    
+    ##
+    # Raised when the packet being unpacked is badly 
+    # formatted.
+    
+    class FormatError < StandardError; end
+    
+    ##
+    # Used to signal the end of a packet as it is being 
+    # unpacked.
+    
+    class EndOfPacket < StandardError; end
+    
+    # Use the refinements made to the supported classes
+    
     using Types
         
     ##
@@ -32,6 +45,9 @@ module MQTTPipe
     def unpack raw, limit: nil
       raw = StringIO.new raw unless raw.respond_to? :read
       result = []
+      
+      # Either loop infinately or the number of times 
+      # specified by limit
       
       (limit.nil? ? loop : limit.times).each do
         result << unpack_single(raw)

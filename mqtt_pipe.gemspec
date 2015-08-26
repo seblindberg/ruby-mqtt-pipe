@@ -8,8 +8,8 @@ Gem::Specification.new do |spec|
   spec.version       = MQTTPipe::VERSION
   spec.authors       = ["Sebastian Lindberg"]
   spec.email         = ["seb.lindberg@gmail.com"]
-  spec.summary       = %q{TODO: Write a short summary. Required.}
-  spec.description   = %q{TODO: Write a longer description. Optional.}
+  spec.summary       = %q{A gem for sending a small set of objects via MQTT.}
+  spec.description   = %q{This gem wraps the MQTT gem by njh (on Github) and adds a serializer for simple data structures.}
   spec.homepage      = "https://github.com/seblindberg/ruby-mqtt-pipe"
   spec.license       = "MIT"
 

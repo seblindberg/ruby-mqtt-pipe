@@ -1,6 +1,6 @@
-# MqttPipe
+# MQTTPipe
 
-This gem wraps the MQTT gem and adds a serializer for simple data structures.
+This gem wraps the [MQTT gem](https://github.com/njh/ruby-mqtt) and adds a serializer for simple data structures.
 
 ## Installation
 

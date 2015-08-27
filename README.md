@@ -88,14 +88,16 @@ Note that the integers are split over several codes to accommodate for the vario
 
 Array and string are also special cases in that their sizes are not known. They require a length value to be passed along with them, but instead of always including an extra byte for that purpose, length smaller than 32 can be encoded directly in the type byte value. An example is shown below:
 
-#### Strings with length 1..31:
+Strings with length 1..31:
 
     'test' -> [0xA0 + 4, 0x74, 0x65, 0x73, 0x74]
 
-#### Strings with length 32..288
+Strings with length 32..288
     
     'testing how really long strings are encoded'
            -> [0xA0, 43 - 32, 0x74, 0x65, 0x73, ...]
+
+Note that both strings and arrays with length 0 are converted to and sent as `nil`.
 
 Some data types that may be supported in the future are:
 

@@ -3,6 +3,41 @@ require 'mqtt_pipe'
 describe MQTTPipe::Packer do
   let(:klass) { MQTTPipe::Packer }
   
+  describe '#supports_type?' do
+    it 'expects one argument' do
+      expect{klass.supports_type?}.to raise_error ArgumentError
+    end
+    
+    context 'When the type is supported' do
+      it 'returns true for integers' do
+        expect(klass.supports_type? Integer).to be true
+        expect(klass.supports_type? Fixnum).to be true
+        expect(klass.supports_type? 42).to be true
+      end
+      
+      it 'returns true for strings' do
+        expect(klass.supports_type? String).to be true
+        expect(klass.supports_type? 'string').to be true
+      end
+      
+      it 'returns true for arrays containing supported types' do
+        expect(klass.supports_type? Array).to be true
+        expect(klass.supports_type? [42, 'string']).to be true
+      end
+    end
+    
+    context 'When the type is not supported' do
+      it 'returns false for arbitrary classes/objects' do
+        expect(klass.supports_type? Regexp).to be false
+        expect(klass.supports_type? /regexp/).to be false
+      end
+      
+      it 'returns false for arrays containing unsupported objects' do
+        expect(klass.supports_type? [42, /regexp/]).to be false
+      end
+    end
+  end
+  
   describe '#pack/#[]' do
     describe 'Array' do
       it 'serializes empty arrays to nil' do

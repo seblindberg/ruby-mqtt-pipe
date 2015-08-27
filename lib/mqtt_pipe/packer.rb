@@ -22,6 +22,27 @@ module MQTTPipe
     # Use the refinements made to the supported classes
     
     using Types
+    
+    
+    ##
+    # Checks whether a class or object is supported by the 
+    # packer. For arrays each item is checked recursivly
+    
+    def supports_type? type
+      if type.is_a? Class
+        type.to_packed
+      elsif type.is_a? Array
+        return type.detect{|obj| not supports_type? obj }.nil?
+      else
+        type.class.to_packed
+      end
+      return true
+    rescue NoMethodError
+      return false
+    end
+    
+    alias_method :supports?, :supports_type?
+    
         
     ##
     # Packs the arguments acording to their type.
@@ -58,6 +79,7 @@ module MQTTPipe
       return result
     end
     
+    
     ##
     # A simple helper method to read a given number of bytes
     # +from+ IO object and format them +as+ anything 
@@ -69,6 +91,7 @@ module MQTTPipe
       
       raw.unpack(as).first
     end
+    
     
     private
     

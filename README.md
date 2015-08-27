@@ -97,7 +97,7 @@ Strings with length 32..288
     'testing how really long strings are encoded'
            -> [0xA0, 43 - 32, 0x74, 0x65, 0x73, ...]
 
-Note that both strings and arrays with length 0 are converted to and sent as `nil`.
+**Note that both strings and arrays with length 0 are converted to and sent as `nil`.**
 
 Some data types that may be supported in the future are:
 

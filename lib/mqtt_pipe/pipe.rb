@@ -45,54 +45,57 @@ module MQTTPipe
     # Open the pipe
     
     def open host, port: 1883, &block
-      MQTT::Client.connect host: host, port: port do |client|
+      listener_thread = nil
+      client = MQTT::Client.connect host: host, port: port
   
-        # Subscribe
-        listener_thread = nil
-        
-        unless @listeners.empty?
-          listener_thread = Thread.new do
-            client.get do |topic, data|
-              begin
-                unpacked_data = Packer.unpack data
-                
-                @listeners.each do |listener|
-                  if m = listener.match(topic)
-                    listener.call unpacked_data, *m
-                  end
+      unless @listeners.empty?
+        listener_thread = Thread.new(Thread.current) do |parent|          
+          client.get do |topic, data|
+            begin
+              unpacked_data = Packer.unpack data
+              
+              @listeners.each do |listener|
+                if m = listener.match(topic)
+                  listener.call unpacked_data, *m
                 end
-                
-              rescue Packer::FormatError
-                # TODO: Handle more gracefully
-                puts 'Could not parse data!'
-                next
               end
+              
+            rescue Packer::FormatError
+              # TODO: Handle more gracefully
+              puts 'Could not parse data!'
+              next
+              
+            # Raise the exception in the parent thread 
+            rescue Exception => e
+              parent.raise e
             end
           end
-          
-          client.subscribe *topics
         end
-                  
-        unless block.nil?
-          context = Context.new client
-          
-          begin
-            context.instance_eval &block
-          rescue ConnectionError
-            
-            puts 'Need to reconnect'
-          rescue Interrupt
-          ensure
-            listener_thread.exit unless topics.empty?
-          end
         
-        else
-          begin
-            listener_thread.join unless topics.empty?
-          rescue Interrupt
-          end
+        client.subscribe *topics
+      end
+      
+      # Call user block
+      unless block.nil?
+        begin
+          context = Context.new client
+          context.instance_eval &block
+        rescue ConnectionError
+          puts 'TODO: Handle reconnect'
+        rescue Interrupt
+          exit
         end
       end
+      
+      # Join with listener thread
+      begin
+        listener_thread.join unless listener_thread.nil?
+      rescue Interrupt
+      end
+      
+    ensure
+      client.disconnect
+      listener_thread.exit unless listener_thread.nil?
     end
     
     private

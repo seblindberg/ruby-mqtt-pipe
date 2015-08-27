@@ -41,7 +41,7 @@ MQTTPipe.create do
 end
 ```
 
-Everything does not need to be contained in a block:
+Or without the block:
 
 ```ruby
 pipe = MQTTPipe.create
@@ -56,6 +56,9 @@ pipe.open 'test.mosquitto.org', port: 1883 do
   end
 end
 ```
+
+Calling #on registers an event listener that will
+
 
 ## Protocol
 

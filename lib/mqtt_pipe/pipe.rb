@@ -10,11 +10,11 @@ module MQTTPipe
     
     class ConnectionError < StandardError; end
     
+    ##
+    # Create a new pipe and optionally yield to a block
     
     def initialize &block
-      @listeners = []    
-      #@config = Config.new  
-      
+      @listeners = []      
       instance_eval &block unless block.nil?
     end
     

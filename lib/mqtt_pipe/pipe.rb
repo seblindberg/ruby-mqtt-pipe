@@ -11,9 +11,34 @@ module MQTTPipe
     class ConnectionError < StandardError; end
     
     
-    def initialize &block      
-      @config = Config.new  
-      @config.instance_eval &block unless block.nil?
+    def initialize &block
+      @listeners = []    
+      #@config = Config.new  
+      
+      instance_eval &block unless block.nil?
+    end
+    
+    ##
+    # Subscribe to a topic and attatch an action that will
+    # be called once a message with a matching topic is 
+    # received.
+    
+    def on topic, &action
+      raise ArgumentError, 'No block given' if action.nil?
+      @listeners << Listener.new(topic, &action)
+    end
+    
+    ##
+    # Subscribe to all topics
+    
+    def on_anything &action
+      on '#', &action
+    end
+    
+    alias_method :on_everything, :on_anything
+    
+    def topics
+      @listeners.map{|listener| listener.topic }
     end
     
     ##
@@ -23,16 +48,15 @@ module MQTTPipe
       MQTT::Client.connect host: host, port: port do |client|
   
         # Subscribe
-        topics = @config.listeners.map{|listener| listener.topic }
         listener_thread = nil
         
-        unless topics.empty?
+        unless @listeners.empty?
           listener_thread = Thread.new do
             client.get do |topic, data|
               begin
                 unpacked_data = Packer.unpack data
                 
-                @config.listeners.each do |listener|
+                @listeners.each do |listener|
                   if m = listener.match(topic)
                     listener.call unpacked_data, *m
                   end

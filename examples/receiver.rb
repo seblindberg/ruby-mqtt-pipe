@@ -5,5 +5,5 @@ pipe = MQTTPipe.create do
     p message, id
   end
   
-  open 'test.mosquitto.org', port: 1883
+  open 'localhost', port: 1883
 end

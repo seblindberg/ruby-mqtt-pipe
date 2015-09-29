@@ -64,7 +64,7 @@ module MQTTPipe
     # the original values.
     
     def unpack raw, limit: nil
-      raw = StringIO.new raw unless raw.respond_to? :read
+      raw = ::StringIO.new raw unless raw.respond_to? :read
       result = []
       
       # Either loop infinately or the number of times 

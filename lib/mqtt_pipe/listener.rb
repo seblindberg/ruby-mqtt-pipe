@@ -6,7 +6,7 @@ module MQTTPipe
   # given string as well as calling the action.
   
   class Listener
-    attr_reader :topic, :pattern
+    attr_reader :topic, :pattern, :action
     
     ##
     # The listener requires a topic string and a callable 
@@ -20,7 +20,7 @@ module MQTTPipe
       @topic = topic
       @action = action
       
-      pattern = topic.gsub('*', '([^/]+)').gsub('/#', '/?(.*)')
+      pattern = topic.gsub('*', '([^/]+)').gsub('/#', '/?(.*)').gsub('#', '(.*)')
       @pattern = %r{^#{pattern}$}
     end
     

@@ -57,8 +57,6 @@ pipe.open 'test.mosquitto.org', port: 1883 do
 end
 ```
 
-Calling #on registers an event listener that will
-
 
 ## Protocol
 

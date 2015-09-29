@@ -3,6 +3,7 @@ require 'mqtt_pipe'
 describe MQTTPipe::Listener do
   let(:klass) { MQTTPipe::Listener }
   let(:topic)              { 'test/*/topic/#' }
+  let(:topic_pattern)       { %r{^test/([^/]+)/topic/?(.*)$} }
   let(:matching_topic_1)   { 'test/some/topic' }
   let(:matching_topic_2)   { 'test/some/topic/with/more/5' }
   let(:non_matching_topic) { 'test/topic/with/8' }
@@ -31,6 +32,7 @@ describe MQTTPipe::Listener do
         pattern = @listener.pattern
         
         expect(pattern).to be_a(Regexp)
+        expect(pattern).to eq topic_pattern
         expect(pattern === topic).to be true
       end
       
@@ -82,6 +84,5 @@ describe MQTTPipe::Listener do
         expect(@listener.run 42).to eq 84
       end
     end
-    
   end
 end

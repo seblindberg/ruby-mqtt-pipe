@@ -13,5 +13,14 @@ module MQTTPipe
         [PACKER_CODE, r, g, b].pack 'C4'
       end
     end
+    
+    class << Color
+      def from_packed _, raw
+        color = 3.times.map do
+          Packer.read_packed_bytes(1, from: raw, as: 'C')
+        end
+        new *color
+      end
+    end
   end
 end

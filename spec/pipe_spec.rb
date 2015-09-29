@@ -35,6 +35,9 @@ describe MQTTPipe::Pipe do
       end
     end
     
+    describe '#on_error' do
+    end
+    
     describe '#topics' do
       it 'stores the topics that have beed subscribed to' do
         expect(@pipe.topics.empty?).to be true

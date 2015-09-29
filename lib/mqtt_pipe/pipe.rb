@@ -6,7 +6,7 @@ module MQTTPipe
   class Pipe
     
     ##
-    # Raised when the connection unexpectedly lost.
+    # Raised when the connection is broken
     
     class ConnectionError < StandardError; end
     
@@ -14,7 +14,9 @@ module MQTTPipe
     # Create a new pipe and optionally yield to a block
     
     def initialize &block
-      @listeners = []      
+      @listeners = []
+      @error_handler = nil
+      
       instance_eval &block unless block.nil?
     end
     
@@ -35,6 +37,10 @@ module MQTTPipe
       on '#', &action
     end
     
+    def on_error &action
+      @error_handler = action
+    end
+    
     alias_method :on_everything, :on_anything
     
     def topics
@@ -47,6 +53,7 @@ module MQTTPipe
     def open host, port: 1883, &block
       listener_thread = nil
       client = MQTT::Client.connect host: host, port: port
+      context = Context.new client
   
       unless @listeners.empty?
         listener_thread = Thread.new(Thread.current) do |parent|          
@@ -56,16 +63,16 @@ module MQTTPipe
               
               @listeners.each do |listener|
                 if m = listener.match(topic)
-                  listener.call unpacked_data, *m
+                  #listener.call unpacked_data, *m
+                  context.instance_exec unpacked_data, *m, &listener.action
                 end
               end
               
             rescue Packer::FormatError
-              # TODO: Handle more gracefully
-              puts 'Could not parse data!'
+              @error_handler.call topic, data unless @error_handler.nil?
               next
               
-            # Raise the exception in the parent thread 
+            # Raise the exception in the parent thread
             rescue Exception => e
               parent.raise e
             end
@@ -78,7 +85,6 @@ module MQTTPipe
       # Call user block
       unless block.nil?
         begin
-          context = Context.new client
           context.instance_eval &block
         rescue ConnectionError
           puts 'TODO: Handle reconnect'

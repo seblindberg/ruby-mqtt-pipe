@@ -52,7 +52,7 @@ module MQTTPipe
     
     def open host, port: 1883, &block
       listener_thread = nil
-      client = MQTT::Client.connect host: host, port: port
+      client  = MQTT::Client.connect host: host, port: port
       context = Context.new client
   
       unless @listeners.empty?
@@ -83,7 +83,7 @@ module MQTTPipe
       end
       
       # Call user block
-      unless block.nil?
+      if block_given?
         begin
           context.instance_eval &block
         rescue ConnectionError
@@ -100,8 +100,8 @@ module MQTTPipe
       end
       
     ensure
-      client.disconnect
-      listener_thread.exit unless listener_thread.nil?
+      client.disconnect if client
+      listener_thread.exit if listener_thread
     end
     
     private
